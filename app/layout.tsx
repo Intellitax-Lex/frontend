@@ -1,7 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './global.css'
+import { Inter } from 'next/font/google' // (O la fuente que elijan)
+import './global.css' // Importa los estilos de Tailwind
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} bg-blue-950`}>
+      <body className={`${inter.className} bg-brand-gray-100`}>
         {children}
       </body>
     </html>
