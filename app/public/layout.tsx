@@ -1,20 +1,23 @@
 // app/(public)/layout.tsx
-// Este layout envuelve todas las páginas públicas (Home, Precios, Login, etc.)
-
+// Este es el layout principal para TODA la aplicación.
 import React from 'react';
-// (Asegúrate de crear estos dos componentes en las siguientes rutas)
-import { HeaderPublico } from '../../components/HeaderPublico';
-import { FooterPublico } from '../../components/FooterPublico';
+import { HeaderPublico } from '@/components/HeaderPublico';
+import { FooterPublico } from '@/components/FooterPublico';
+import { createClient as createServerClient } from '@/lib/supabase/server'; 
+import { cookies } from 'next/headers';
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
   return (
-    // Fondo azul oscuro principal, altura mínima de pantalla
-    <div className="flex min-h-screen flex-col bg-blue-950 text-white">
-      <HeaderPublico />
+    <div className="flex min-h-screen flex-col">
+      {/* Pasamos la sesión al Header para que sepa si mostrar "Login" o "Dashboard" */}
+      <HeaderPublico userSession={session} />
       <main className="flex-grow">{children}</main>
       <FooterPublico />
     </div>
