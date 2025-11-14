@@ -9,26 +9,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'brand-blue': {
-          950: '#012d4d', // Fondo Principal (Azul Oscuro)
-          900: '#02416b', // Fondos de Tarjetas
-          800: '#03558a', // Bordes / Hover
-          700: '#0469a8', // Bordes más claros
-          300: '#82c0e6', // Texto (Gris-Azulado)
-          200: '#b0d6f0'  // Texto (Más Claro)
+        // Paleta principal (basada en las capturas)
+        'brand-dark': '#212529', // (El fondo oscuro del header/footer)
+        'brand-gold': {
+          DEFAULT: '#E6A12E', // (Tono oro/amarillo del botón "Registrarse")
+          500: '#E6A12E',
+          600: '#D49429', // (Ligeramente más oscuro para hover)
         },
-        'brand-teal': {
-          400: '#26f7c8', // Acento (Hover)
-          500: '#00ffc4', // Acento Principal (Botones)
-          600: '#00e0ad', // Acento (Oscuro)
-          950: '#003d2e'  // (Texto sobre botón teal)
+        'brand-gray': {
+          100: '#F8F9FA', // (Fondo blanco/gris claro de Precios/Términos)
+          500: '#6C757D', // (Texto de descripción gris)
+          700: '#495057', // (Bordes de inputs)
+        },
+        'brand-text': {
+          dark: '#343A40', // (Texto principal sobre fondo blanco)
+          light: '#F8F9FA', // (Texto principal sobre fondo oscuro)
         }
       }
     },
   },
   plugins: [
-    require('@headlessui/tailwindcss'),
+    // Plugins necesarios para los formularios y menús
     require('@tailwindcss/forms'),
+    require('@headlessui/tailwindcss'),
   ],
 }
 export default config
