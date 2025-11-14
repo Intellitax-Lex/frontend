@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/middleware.ts"],"sourcesContent":["// middleware.ts\nimport { NextResponse } from 'next/server'\nimport type { NextRequest } from 'next/server'\n\nexport function middleware(req: NextRequest) {\n  // Sin checks: app funciona visualmente en todas las rutas\n  return NextResponse.next()\n}\n\nexport const config = {\n  matcher: ['/((?!_next|static|favicon.ico).*)'],\n}\n"],"names":[],"mappings":"AAAA,gBAAgB;;;;;;;AAChB;AAAA;;AAGO,SAAS,WAAW,GAAgB;IACzC,0DAA0D;IAC1D,OAAO,gMAAY,CAAC,IAAI;AAC1B;AAEO,MAAM,SAAS;IACpB,SAAS;QAAC;KAAoC;AAChD"}}]
+}
