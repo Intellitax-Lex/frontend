@@ -1,12 +1,17 @@
 // middleware.ts
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware(req: NextRequest) {
-  // Sin checks: app funciona visualmente en todas las rutas
-  return NextResponse.next()
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next();
+  const supabase = createMiddlewareClient({ req, res });
+  await supabase.auth.getSession(); // Refresca la sesión en cada request
+  return res;
 }
 
 export const config = {
-  matcher: ['/((?!_next|static|favicon.ico).*)'],
-}
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+};
