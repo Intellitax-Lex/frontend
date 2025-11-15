@@ -1,9 +1,9 @@
 // app/(public)/layout.tsx
 // Este es el layout principal para TODA la aplicación.
 import React from 'react';
-import { HeaderPublico } from '@/components/HeaderPublico';
-import { FooterPublico } from '@/components/FooterPublico';
-import { createClient as createServerClient } from '@/lib/supabase/server'; 
+import { HeaderPublico } from '../../components/HeaderPublico';
+import { FooterPublico } from '../../components/FooterPublico';
+// import { createClient as createServerClient } from '@/lib/supabase/server'; 
 import { cookies } from 'next/headers';
 
 export default async function PublicLayout({
@@ -11,7 +11,8 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createServerClient();
+  // const supabase = createServerClient();
+  const supabase = null;
   const { data: { session } } = await supabase.auth.getSession();
 
   return (
