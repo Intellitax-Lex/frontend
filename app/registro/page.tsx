@@ -1,252 +1,204 @@
-// app/(public)/registro/page.tsx
-'use client';
-
-import React, { useState } from 'react';
-import Link from 'next/link';
+'use client'
+import { useState } from 'react';
+import  Link from 'next/link';
 import { useRouter } from 'next/navigation';
-// import { createClient as createClientComponentClient } from '@/lib/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Button } from '../../@/components/ui/button';
+import { Input } from '../../@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../@/components/ui/select';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../@/components/ui/card';
+import { Label } from '../../@/components/ui/label';
+import { Checkbox } from '../../@/components/ui/checkbox';
+import { useToast } from '../../@/hooks/use-toast';
+// import { supabase } from '@/integrations/supabase/client';
+import { Scale } from 'lucide-react';
 
-// Definimos el tipo de Plan para TypeScript (del ENUM de la DB)
-type Plan = 'personal' | 'profesional' | 'estudio';
-
-export default function RegistroPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  
-  // Estado para el plan seleccionado. 'personal' por defecto.
-  const [plan, setPlan] = useState<Plan>('personal'); 
-  const [orgName, setOrgName] = useState('');
-  const [agreedToPolicy, setAgreedToPolicy] = useState(false);
-  
-  const [error, setError] = useState<string | null>(null);
+const Registro = () => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    plan: 'personal'
+  });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  // const supabase = createClientComponentClient();
+  const { toast } = useToast();
 
-  // ESTA ES LA FUNCIÓN CLAVE QUE LLAMA AL TRIGGER 1
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+
+    if (!acceptedTerms) {
+      toast({
+        title: "Error",
+        description: "Debes aceptar la Política de Privacidad y Términos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Las contraseñas no coinciden",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
-    // --- Validaciones del Front-End ---
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      setIsLoading(false);
-      return;
-    }
-    if (plan !== 'personal' && !orgName) {
-      setError("Por favor, ingrese el nombre de su organización.");
-      setIsLoading(false);
-      return;
-    }
-    if (!agreedToPolicy) {
-      setError("Debe aceptar la Política de Privacidad para continuar.");
-      setIsLoading(false);
-      return;
-    }
+    try {
+      // const { error } = await supabase.auth.signUp({
+      //   email: formData.email,
+      //   password: formData.password,
+      //   options: {
+      //     data: {
+      //       full_name: formData.fullName,
+      //       plan: formData.plan
+      //     },
+      //     emailRedirectTo: `${window.location.origin}/chat`
+      //   }
+      // });
 
-    // --- ¡LA LÓGICA DEL TRIGGER! ---
-    // Preparamos el objeto 'options.data' que leerá el Trigger
-    // 'handle_new_user' en la base de datos.
-    const options = {
-      data: {
-        plan: plan,
-        // Solo enviamos 'org_name' si el plan no es 'personal'
-        org_name: plan !== 'personal' ? orgName : undefined, 
-        // (Ana podría añadir un 'full_name' aquí si lo pide en el form)
-      }
-    };
+      const error = null;
 
-    // --- Llamada a Supabase Auth ---
-    // const { error: signUpError } = await supabase.auth.signUp({
-    //   email,
-    //   password,
-    //   options, // <-- Aquí pasamos los metadatos
-    // });
+      if (error) throw error;
 
-    const signUpError = null;
+      toast({
+        title: "Registro exitoso",
+        description: "Bienvenido a IntelliTax Lex. Redirigiendo...",
+      });
 
-    if (signUpError) {
-      setError(signUpError.message);
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Error al registrarse",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    } else {
-      // Éxito. Redirigimos al usuario al dashboard.
-      // (Supabase puede requerir verificación de email, pero el Trigger 1
-      // YA creó la suscripción en la DB).
-      router.push('/dashboard'); // Redirige a la app
-      router.refresh();
     }
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-teal-400">
-          IntelliTax Lex
-        </h2>
-        <h3 className="mt-2 text-center text-xl font-medium text-white">
-          Crea tu cuenta nueva
-        </h3>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-blue-900 p-8 shadow-xl ring-1 ring-blue-700 sm:rounded-lg">
-          <form className="space-y-6" onSubmit={handleRegister}>
-            {/* Campo de Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-blue-200">Email</label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-md border-0 bg-blue-800/50 py-2.5 text-white ring-1 ring-inset ring-blue-700 focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                />
-              </div>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-legal-navy via-legal-dark to-legal-navy p-4">
+      <Card className="w-full max-w-lg bg-white">
+        <CardHeader className="text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-gradient-to-br from-legal-navy to-legal-dark">
+              <Scale className="h-10 w-10 text-legal-gold" />
             </div>
-
-            {/* Campo de Contraseña */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-blue-200">Contraseña (mínimo 6 caracteres)</label>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-md border-0 bg-blue-800/50 py-2.5 text-white ring-1 ring-inset ring-blue-700 focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                />
-              </div>
-            </div>
-
-            {/* Campo de Confirmar Contraseña */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-blue-200">Confirmar Contraseña</label>
-              <div className="mt-2">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full rounded-md border-0 bg-blue-800/50 py-2.5 text-white ring-1 ring-inset ring-blue-700 focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                />
-              </div>
-            </div>
-
-            {/* Selección de Plan */}
-            <fieldset className="mt-4">
-              <legend className="block text-sm font-medium leading-6 text-blue-200">Selecciona tu Plan</legend>
-              <div className="mt-2 grid grid-cols-2 gap-4">
-                {/* Opción Personal */}
-                <label 
-                  className={`flex cursor-pointer rounded-lg border p-4 ${plan === 'personal' ? 'bg-teal-900 border-teal-500 ring-2 ring-teal-500' : 'bg-blue-800/50 border-blue-700 hover:bg-blue-800'}`}
-                >
-                  <input
-                    type="radio"
-                    name="plan"
-                    value="personal"
-                    checked={plan === 'personal'}
-                    onChange={() => setPlan('personal')}
-                    className="h-4 w-4 mt-0.5 text-teal-600 focus:ring-teal-500 border-gray-500"
-                  />
-                  <span className="ml-3 block text-sm font-medium text-white">Plan Personal</span>
-                </label>
-                {/* Opción B2B */}
-                <label 
-                  className={`flex cursor-pointer rounded-lg border p-4 ${plan !== 'personal' ? 'bg-teal-900 border-teal-500 ring-2 ring-teal-500' : 'bg-blue-800/50 border-blue-700 hover:bg-blue-800'}`}
-                >
-                  <input
-                    type="radio"
-                    name="plan"
-                    value="profesional" // 'profesional' o 'estudio' se manejan igual
-                    checked={plan !== 'personal'}
-                    onChange={() => setPlan('profesional')} // Asumimos B2B
-                    className="h-4 w-4 mt-0.5 text-teal-600 focus:ring-teal-500 border-gray-500"
-                  />
-                  <span className="ml-3 block text-sm font-medium text-white">Profesional / Estudio</span>
-                </label>
-              </div>
-            </fieldset>
-
-            {/* Campo Condicional: Nombre de Organización */}
-            {plan !== 'personal' && (
-              <div> {/* (Ana puede añadir una animación simple aquí) */}
-                <label htmlFor="orgName" className="block text-sm font-medium leading-6 text-blue-200">
-                  Nombre de tu Estudio / Organización
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="orgName"
-                    name="orgName"
-                    type="text"
-                    // required={plan !== 'personal'}
-                    value={orgName}
-                    onChange={(e) => setOrgName(e.target.value)}
-                    className="block w-full rounded-md border-0 bg-blue-800/50 py-2.5 text-white ring-1 ring-inset ring-blue-700 focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Checkbox de Política de Privacidad (BLOQUEADO HASTA TAREA N-1) */}
-            <div className="flex items-center space-x-3">
-              <input
-                id="policy"
-                name="policy"
-                type="checkbox"
-                checked={agreedToPolicy}
-                onChange={(e) => setAgreedToPolicy(e.target.checked)}
-                className="h-4 w-4 rounded bg-blue-800 border-blue-700 text-teal-600 focus:ring-teal-500"
+          </div>
+          <CardTitle className="text-2xl">Crear Cuenta</CardTitle>
+          <CardDescription>
+            Comience su experiencia con IntelliTax Lex
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Nombre Completo</Label>
+              <Input 
+                id="fullName" 
+                placeholder="Juan Pérez"
+                value={formData.fullName}
+                onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                required
               />
-              <label htmlFor="policy" className="text-sm leading-6 text-blue-300">
-                Acepto la <a href="/politica-privacidad" target="_blank" className="font-semibold text-teal-400 hover:text-teal-300">Política de Privacidad</a>
-              </label>
             </div>
-
-            {/* Mensaje de Error */}
-            {error && (
-              <div className="rounded-md bg-red-900/50 p-3 ring-1 ring-red-700">
-                <p className="text-sm text-red-300">{error}</p>
-              </div>
-            )}
-
-            {/* Botón de Submit */}
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading || !agreedToPolicy} // Deshabilitado si está cargando o no aceptó
-                className="flex w-full justify-center rounded-md bg-teal-500 px-3 py-2.5 text-sm font-semibold leading-6 text-blue-950 shadow-sm hover:bg-teal-400 focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                 {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  'Crear Cuenta'
-                )}
-              </button>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo Electrónico</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="correo@ejemplo.com"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+              />
             </div>
-          </form>
-
-          {/* Link a Login */}
-          <p className="mt-10 text-center text-sm text-blue-300">
-            ¿Ya tienes una cuenta?{' '}
-            <Link href="/login" className="font-semibold leading-6 text-teal-400 hover:text-teal-300">
-              Inicia Sesión aquí
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input 
+                id="password" 
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+              <Input 
+                id="confirmPassword" 
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="plan">Plan</Label>
+              <Select value={formData.plan} onValueChange={(value) => setFormData({...formData, plan: value})}>
+                <SelectTrigger id="plan">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="personal">Personal (100 preguntas/mes)</SelectItem>
+                  <SelectItem value="profesional">Profesional (500 preguntas/mes)</SelectItem>
+                  <SelectItem value="estudio">Estudio (1000 preguntas/mes)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-start gap-2">
+              <Checkbox 
+                id="terms" 
+                className="mt-1"
+                checked={acceptedTerms}
+                onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+              />
+              <Label htmlFor="terms" className="text-sm leading-relaxed">
+                Acepto la{" "}
+                <Link href="/privacidad" className="font-medium text-legal-gold hover:underline">
+                  Política de Privacidad y Tratamiento de Datos
+                </Link>{" "}
+                y los{" "}
+                <Link href="/terminos" className="font-medium text-legal-gold hover:underline">
+                  Términos de Uso
+                </Link>
+              </Label>
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full bg-legal-gold text-legal-dark hover:bg-legal-gold/90"
+              disabled={isLoading || !acceptedTerms}
+            >
+              {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
+            </Button>
+          </CardContent>
+        </form>
+        <CardFooter className="flex flex-col gap-2">
+          <p className="text-center text-sm text-muted-foreground">
+            ¿Ya tiene una cuenta?{" "}
+            <Link href="/login" className="font-medium text-legal-gold hover:underline">
+              Inicie sesión
             </Link>
           </p>
-        </div>
-      </div>
+          <Link href="/" className="text-center text-sm text-muted-foreground hover:underline">
+            Volver al inicio
+          </Link>
+        </CardFooter>
+      </Card>
     </div>
   );
-}
+};
 
+export default Registro;
