@@ -5,8 +5,8 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
-  await supabase.auth.getSession(); // Refresca la sesión en cada request
+  // const supabase = createMiddlewareClient({ req, res });
+  // await supabase.auth.getSession(); // Refresca la sesión en cada request
   return res;
 }
 
