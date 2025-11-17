@@ -1,8 +1,9 @@
+'use client'
 import  Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from "../../@/components/ui/button";
 import { Scale, LayoutDashboard, User, Shield, ShoppingCart, Heart } from "lucide-react";
-// import { supabase } from "@/integrations/supabase/client";
+import { createClient } from '../../lib/supabase/client';
 import { useEffect, useState } from "react";
 import {
   DropdownMenu,
@@ -18,48 +19,48 @@ const Header = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const supabase = createClient(); 
 
   useEffect(() => {
-    // checkUser();
-    // const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-    //   setUser(session?.user ?? null);
-    //   if (session?.user) {
-    //     checkAdminRole(session.user.id);
-    //   } else {
-    //     setIsAdmin(false);
-    //   }
-    // });
+    checkUser();
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
+    });
 
-    const authListener = null;
 
     return () => {
-      // authListener.subscription.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, []);
 
-//   const checkUser = async () => {
-//     const { data: { user } } = await supabase.auth.getUser();
-//     setUser(user);
-//     if (user) {
-//       checkAdminRole(user.id);
-//     }
-//   };
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    if (user) {
+      checkAdminRole(user.id);
+    }
+  };
 
-//   const checkAdminRole = async (userId: string) => {
-//     const { data, error } = await supabase
-//       .from("user_roles")
-//       .select("role")
-//       .eq("user_id", userId)
-//       .eq("role", "admin")
-//       .maybeSingle();
+  const checkAdminRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
 
-//     setIsAdmin(!!data && !error);
-//   };
+    setIsAdmin(!!data && !error);
+  };
 
-//   const handleLogout = async () => {
-//     await supabase.auth.signOut();
-//     navigate("/");
-//   };
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   const getUserInitials = () => {
     if (!user?.user_metadata?.full_name) return "U";
@@ -158,7 +159,7 @@ const Header = () => {
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => {}}>
+                  <DropdownMenuItem onClick={() => handleLogout()}>
                     Cerrar Sesión
                   </DropdownMenuItem>
                 </DropdownMenuContent>
