@@ -15,8 +15,8 @@ import {
   Clock,
   Award
 } from "lucide-react";
-// import { supabase } from "@/integrations/supabase/client";
-import { Toast } from "../../../@/components/ui/toast";
+import { createClient } from '../../../lib/supabase/client';
+import { useToast } from '../../../@/hooks/use-toast';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -30,71 +30,77 @@ const Dashboard = () => {
     certificatesEarned: 0
   });
   const [loading, setLoading] = useState(false);
+  const supabase = createClient(); 
+  const { toast } = useToast();
 
   useEffect(() => {
-    // checkAuth();
+    checkAuth();
   }, []);
 
-//   const checkAuth = async () => {
-//     try {
-//       const { data: { user } } = await supabase.auth.getUser();
-//       if (!user) {
-//         router.push("/login");
-//         return;
-//       }
-//       setUser(user);
-//       await loadUserData(user.id);
-//     } catch (error) {
-//       console.error("Error:", error);
-//       toast.error("Error al cargar los datos");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  const checkAuth = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      setUser(user);
+      await loadUserData(user.id);
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "Error al cargar los datos",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//   const loadUserData = async (userId: string) => {
-//     const { data: subData } = await supabase
-//       .from("Suscripciones")
-//       .select("*")
-//       .eq("user_id", userId)
-//       .single();
+  const loadUserData = async (userId: string) => {
+    const { data: subData } = await supabase
+      .from("Suscripciones")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
 
-//     if (subData) {
-//       setSubscription(subData);
-//     }
+    if (subData) {
+      setSubscription(subData);
+    }
 
-//     // Load chat history count
-//     const { count: chatCount } = await supabase
-//       .from("Historial_Chat")
-//       .select("*", { count: "exact", head: true })
-//       .eq("user_id", userId);
+    // Load chat history count
+    const { count: chatCount } = await supabase
+      .from("Historial_Chat")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
 
-//     // Load contracts count
-//     const { count: contractsCount } = await supabase
-//       .from("contratos_generados")
-//       .select("*", { count: "exact", head: true })
-//       .eq("user_id", userId);
+    // Load contracts count
+    const { count: contractsCount } = await supabase
+      .from("contratos_generados")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
 
-//     // Load courses count
-//     const { count: coursesCount } = await supabase
-//       .from("inscripciones_cursos")
-//       .select("*", { count: "exact", head: true })
-//       .eq("user_id", userId);
+    // Load courses count
+    const { count: coursesCount } = await supabase
+      .from("inscripciones_cursos")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
 
-//     // Load certificates count
-//     const { count: certificatesCount } = await supabase
-//       .from("certificados")
-//       .select("*", { count: "exact", head: true })
-//       .eq("user_id", userId);
+    // Load certificates count
+    const { count: certificatesCount } = await supabase
+      .from("certificados")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
 
-//     setStats(prev => ({ 
-//       ...prev, 
-//       chatQuestions: chatCount || 0,
-//       contractsGenerated: contractsCount || 0,
-//       coursesInProgress: coursesCount || 0,
-//       certificatesEarned: certificatesCount || 0
-//     }));
-//   };
+    setStats(prev => ({ 
+      ...prev, 
+      chatQuestions: chatCount || 0,
+      contractsGenerated: contractsCount || 0,
+      coursesInProgress: coursesCount || 0,
+      certificatesEarned: certificatesCount || 0
+    }));
+  };
 
   const getPlanName = (plan: string) => {
     const names: Record<string, string> = {

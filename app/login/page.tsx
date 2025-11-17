@@ -7,7 +7,7 @@ import { Input } from '../../@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../@/components/ui/card';
 import { Label } from '../../@/components/ui/label';
 import { useToast } from "../../@/hooks/use-toast"
-//import { supabase } from '@/integrations/supabase/client';
+import { createClient } from '../../lib/supabase/client';
 import { Scale } from 'lucide-react';
 
 const Login = () => {
@@ -16,18 +16,18 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const supabase = createClient(); 
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // const { error } = await supabase.auth.signInWithPassword({
-      //   email,
-      //   password,
-      // });
-
-      const error = null;
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+     });
 
       if (error) throw error;
 

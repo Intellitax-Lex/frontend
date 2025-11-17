@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '../../@/components/ui/label';
 import { Checkbox } from '../../@/components/ui/checkbox';
 import { useToast } from '../../@/hooks/use-toast';
-// import { supabase } from '@/integrations/supabase/client';
+import { createClient } from '../../lib/supabase/client';
 import { Scale } from 'lucide-react';
 
 const Registro = () => {
@@ -24,6 +24,7 @@ const Registro = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const supabase = createClient(); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,19 +50,17 @@ const Registro = () => {
     setIsLoading(true);
 
     try {
-      // const { error } = await supabase.auth.signUp({
-      //   email: formData.email,
-      //   password: formData.password,
-      //   options: {
-      //     data: {
-      //       full_name: formData.fullName,
-      //       plan: formData.plan
-      //     },
-      //     emailRedirectTo: `${window.location.origin}/chat`
-      //   }
-      // });
-
-      const error = null;
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            plan: formData.plan
+          },
+          emailRedirectTo: `${window.location.origin}/chat`
+        }
+      });
 
       if (error) throw error;
 
