@@ -150,7 +150,7 @@ const Header = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/perfil")}>
+                  <DropdownMenuItem  onClick={() => router.push("/perfil")}>
                     <User className="w-4 h-4 mr-2" />
                     Perfil
                   </DropdownMenuItem>

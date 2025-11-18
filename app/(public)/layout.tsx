@@ -1,7 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google"; // (O la fuente que elijan)
-import "./globals.css"; // Importa los estilos de Tailwind
+import "../globals.css"; // Importa los estilos de Tailwind
 
 const inter = Inter({ subsets: ["latin"] });
 
